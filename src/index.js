@@ -62,7 +62,7 @@ app.post("/todos", checksExistsUserAccount, (request, response) => {
 
   users[userIndex].todos.push(newTodo);
 
-  response.json(newTodo);
+  response.status(201).json(newTodo);
 });
 
 app.put("/todos/:id", checksExistsUserAccount, (request, response) => {
@@ -70,6 +70,10 @@ app.put("/todos/:id", checksExistsUserAccount, (request, response) => {
   const { id } = request.params;
 
   const { user } = request;
+
+  if (!user.todo[id - 1]) {
+    return response.status(404).json({ error: "Todo not found!" });
+  }
 
   const userIndex = users.indexOf(user);
   users[userIndex].todos[id - 1].title = title;
