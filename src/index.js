@@ -28,10 +28,10 @@ app.post("/users", (request, response) => {
   const { name, username } = request.body;
 
   const newUser = {
-    "id" : uuidv4(),
-    "name": name,
-    "username": username,
-    "todos": [],
+    id: uuidv4(),
+    name: name,
+    username: username,
+    todos: [],
   };
 
   users.push(newUser);
@@ -46,7 +46,23 @@ app.get("/todos", checksExistsUserAccount, (request, response) => {
 });
 
 app.post("/todos", checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { title, deadline } = request.body;
+
+  const { user } = request;
+
+  const newTodo = {
+    id: uuidv4(),
+    title: title,
+    done: false,
+    deadline: new Date(deadline),
+    created_at: new Date(),
+  };
+
+  const userIndex = users.indexOf(user);
+
+  users[userIndex].todos.push(newTodo);
+
+  response.json(newTodo);
 });
 
 app.put("/todos/:id", checksExistsUserAccount, (request, response) => {
