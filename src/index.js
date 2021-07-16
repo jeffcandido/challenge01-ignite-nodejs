@@ -13,7 +13,7 @@ const users = [];
 function checksExistsUserAccount(request, response, next) {
   const { username } = request.headers;
 
-  const user = users.find((user) => user.username === String(username));
+  const user = findUserbyUsername(username);
 
   if (!user) {
     return response.status(404).json({ error: "User not found!" });
@@ -24,8 +24,20 @@ function checksExistsUserAccount(request, response, next) {
   return next();
 }
 
+function findUserbyUsername(username) {
+  const user = users.find((user) => user.username === String(username));
+
+  return user;
+}
+
 app.post("/users", (request, response) => {
   const { name, username } = request.body;
+
+  const userExists = findUserbyUsername(username);
+
+  if (userExists) {
+    return response.status(404).json({ error: "User already exists!" });
+  }
 
   const newUser = {
     id: uuidv4(),
@@ -36,7 +48,7 @@ app.post("/users", (request, response) => {
 
   users.push(newUser);
 
-  return response.json(newUser);
+  return response.status(201).json(newUser);
 });
 
 app.get("/todos", checksExistsUserAccount, (request, response) => {
@@ -71,13 +83,20 @@ app.put("/todos/:id", checksExistsUserAccount, (request, response) => {
 
   const { user } = request;
 
-  if (!user.todo[id - 1]) {
+  const todoIndex = user.todos.findIndex((todo) => todo.id == id);
+
+  if (!user.todos[todoIndex]) {
     return response.status(404).json({ error: "Todo not found!" });
   }
 
   const userIndex = users.indexOf(user);
-  users[userIndex].todos[id - 1].title = title;
-  users[userIndex].todos[id - 1].deadline = deadline;
+
+  if (userIndex < 0) {
+    response.status(400).json({ error: "User not found." });
+  }
+
+  users[userIndex].todos[todoIndex].title = title;
+  users[userIndex].todos[todoIndex].deadline = deadline;
 
   response.status(200).send();
 });
