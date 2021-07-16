@@ -98,11 +98,29 @@ app.put("/todos/:id", checksExistsUserAccount, (request, response) => {
   users[userIndex].todos[todoIndex].title = title;
   users[userIndex].todos[todoIndex].deadline = deadline;
 
-  response.status(200).send();
+  response.status(204).send();
 });
 
 app.patch("/todos/:id/done", checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { id } = request.params;
+
+  const { user } = request;
+
+  const todoIndex = user.todos.findIndex((todo) => todo.id == id);
+
+  if (!user.todos[todoIndex]) {
+    return response.status(404).json({ error: "Todo not found!" });
+  }
+
+  const userIndex = users.indexOf(user);
+
+  if (userIndex < 0) {
+    response.status(400).json({ error: "User not found." });
+  }
+
+  users[userIndex].todos[todoIndex].done = true;
+
+  response.status(204).send();
 });
 
 app.delete("/todos/:id", checksExistsUserAccount, (request, response) => {
