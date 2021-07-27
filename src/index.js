@@ -82,7 +82,7 @@ app.put("/todos/:id", checksExistsUserAccount, (request, response) => {
   const { id } = request.params;
 
   const { user } = request;
-
+  
   const todoIndex = user.todos.findIndex((todo) => todo.id == id);
 
   if (!user.todos[todoIndex]) {
@@ -98,7 +98,7 @@ app.put("/todos/:id", checksExistsUserAccount, (request, response) => {
   users[userIndex].todos[todoIndex].title = title;
   users[userIndex].todos[todoIndex].deadline = deadline;
 
-  response.status(204).send();
+  response.json(users[userIndex].todos[todoIndex]);
 });
 
 app.patch("/todos/:id/done", checksExistsUserAccount, (request, response) => {
@@ -120,7 +120,7 @@ app.patch("/todos/:id/done", checksExistsUserAccount, (request, response) => {
 
   users[userIndex].todos[todoIndex].done = true;
 
-  response.status(204).send();
+  response.json(users[userIndex].todos[todoIndex]);
 });
 
 app.delete("/todos/:id", checksExistsUserAccount, (request, response) => {
